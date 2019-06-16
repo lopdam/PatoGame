@@ -1,2 +1,2 @@
 ## Pato Game
-![Rules] (/PatoGameRules.jpeg)
+![Rules](/PatoGameRules.jpeg)
