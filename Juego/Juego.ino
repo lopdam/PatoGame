@@ -22,7 +22,7 @@ Servo servo2;//servo de 0 - max angulo
 #define maxAg 65
 
 //Declaramos el tiempo de esperea entre cada secuencia
-#define tiempo 100
+#define tiempo 500
 //Declaramos los paso que se mueve el servo por cada secuencia
 #define pasos 5
 
@@ -44,6 +44,7 @@ void setup()
   Serial.begin(9600);
   IRS();
   Servos();
+  Reset();
 
 }
 
@@ -127,15 +128,9 @@ void Servos() {
 void Reset() {
 
   //Activamos el servo de manera lenta, para que el movimiento no se brusco
-  for (int i = (180 - minAg); i >= (180 - maxAg); i = i + pasos) {
+  for (int i = maxAg; i >= minAg; i = i + pasos) {
     //Insertamos los grados en el servo
-    servo1.write(i);
-    delay(tiempo);//Esperamos un tiempo entre cada set
-  }
-
-  //Activamos el servo de manera lenta, para que el movimiento no se brusco
-  for (int i = minAg; i <= maxAg; i = i + pasos) {
-    //Insertamos los grados en el servo
+    servo1.write(180-i);
     servo2.write(i);
     delay(tiempo);//Esperamos un tiempo entre cada set
   }
