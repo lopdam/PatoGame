@@ -3,20 +3,28 @@
 #include <IRremote.h>
 #include <Servo.h>
 
-//Declaramos los servos
-Servo servo1;
-Servo servo2;
-Servo servo3;
+//Declaramos los   servos
+Servo servo1;//servo de 180-max angulo
+Servo servo2;//servo de 0 - max angulo
 
+///////////////////////// Define Macros ///////////////////////////////
 //Declaramos los pines para los servos
-int pinServ1 = 9;
-int pinServ2 = 10;
-int pinServ3 = 11;
+#define pinServ1 10
+#define pinServ2 9
+
 
 //Declaramos los pines para el receptor ir
-int RECV_PIN1 = 3;
-int RECV_PIN2 = 5;
-int RECV_PIN3 = 6;
+#define RECV_PIN1 5
+#define RECV_PIN2 3
+
+// Min and Max Angulos de inclinacion de los brazos
+#define minAg 0
+#define maxAg 65
+
+//Declaramos el tiempo de esperea entre cada secuencia
+#define tiempo 100
+//Declaramos los paso que se mueve el servo por cada secuencia
+#define pasos 5
 
 //Declaramos una variable en formato hex que es 0
 
@@ -25,17 +33,10 @@ unsigned long codigo = 0x000;
 //Declaramos los "objs" IR
 IRrecv irrecv1(RECV_PIN1);
 IRrecv irrecv2(RECV_PIN2);
-IRrecv irrecv3(RECV_PIN3);
 
 //Declaramos las variables donde se van a guardar los datos recividos
 decode_results results1;
 decode_results results2;
-decode_results results3;
-
-//Declaramos el tiempo de esperea entre cada secuencia
-int tiempo = 100;
-//Declaramos los paso que se mueve el servo por cada secuencia
-int pasos = 5;
 
 void setup()
 {
@@ -50,7 +51,6 @@ void loop() {
   //Enviamos a correr el programa
   IR1();
   IR2();
-  IR3();
   delay(10);//Lo detenmos un momento para que no se sature
 }
 
@@ -83,24 +83,11 @@ void IR2() {
   }
 }
 
-void IR3() {
-  //Verificamos si se receive un dato
-  if (irrecv3.decode(&results1)) {
-    //Imprimimos el dato
-    Serial.println(results3.value, HEX);
-    //Si el dato es diferente de 0X00, activamos el Servo
-    if (results3.value != codigo) {
-      Servo3();
-    }
-    irrecv3.resume(); // Receive the next value
-  }
-}
-
 
 //Funcione para activar el servo
 void Servo1() {
   //Activamos el servo de manera lenta, para que el movimiento no se brusco
-  for (int i = 0; i <= 180; i = i + pasos) {
+  for (int i = (180 - minAg); i >= (180 - maxAg); i = i + pasos) {
     //Insertamos los grados en el servo
     servo1.write(i);
     delay(tiempo);//Esperamos un tiempo entre cada set
@@ -110,22 +97,13 @@ void Servo1() {
 //Funcione para activar el servo
 void Servo2() {
   //Activamos el servo de manera lenta, para que el movimiento no se brusco
-  for (int i = 0; i <= 180; i = i + pasos) {
+  for (int i = minAg; i <= maxAg; i = i + pasos) {
     //Insertamos los grados en el servo
     servo2.write(i);
     delay(tiempo);//Esperamos un tiempo entre cada set
   }
 }
 
-//Funcione para activar el servo
-void Servo3() {
-  //Activamos el servo de manera lenta, para que el movimiento no se brusco
-  for (int i = 0; i <= 180; i = i + pasos) {
-    //Insertamos los grados en el servo
-    servo3.write(i);
-    delay(tiempo);//Esperamos un tiempo entre cada set
-  }
-}
 
 //Inicializar los IRs
 void IRS() {
@@ -135,7 +113,6 @@ void IRS() {
   // Start the receivers
   irrecv1.enableIRIn();
   irrecv2.enableIRIn();
-  irrecv3.enableIRIn();
   Serial.println("Enabled IRin");
 
 }
@@ -145,5 +122,21 @@ void Servos() {
   //Inici los servos con su pin corresponidente
   servo1.attach(pinServ1);
   servo2.attach(pinServ2);
-  servo3.attach(pinServ3);
+}
+
+void Reset() {
+
+  //Activamos el servo de manera lenta, para que el movimiento no se brusco
+  for (int i = (180 - minAg); i >= (180 - maxAg); i = i + pasos) {
+    //Insertamos los grados en el servo
+    servo1.write(i);
+    delay(tiempo);//Esperamos un tiempo entre cada set
+  }
+
+  //Activamos el servo de manera lenta, para que el movimiento no se brusco
+  for (int i = minAg; i <= maxAg; i = i + pasos) {
+    //Insertamos los grados en el servo
+    servo2.write(i);
+    delay(tiempo);//Esperamos un tiempo entre cada set
+  }
 }
